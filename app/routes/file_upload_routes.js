@@ -22,6 +22,7 @@ const router = express.Router()
 // GET /fileUploads
 router.get('/fileUploads', (req, res, next) => {
   FileUpload.find()
+    .populate('owner')
     .then(fileUploads => {
       return fileUploads.map(fileUpload => fileUpload.toObject())
     })
@@ -33,6 +34,7 @@ router.get('/fileUploads', (req, res, next) => {
 // GET /fileUploads/5a7db6c74d55bc51bdf39793
 router.get('/fileUploads/:id', (req, res, next) => {
   FileUpload.findById(req.params.id)
+    .populate('owner')
     .then(handle404)
     .then(fileUpload => res.status(200).json({ fileUpload: fileUpload.toObject() }))
     .catch(next)
@@ -48,7 +50,7 @@ router.post('/fileUploads', requireToken, upload.single('upload'), (req, res, ne
         name: s3Response.Key,
         fileType: req.file.mimetype,
         url: s3Response.Location,
-        user: req.user
+        owner: req.user
       }
       return FileUpload.create(fileUploadParams)
     })
@@ -60,7 +62,7 @@ router.post('/fileUploads', requireToken, upload.single('upload'), (req, res, ne
 // UPDATE
 // PATCH /fileUploads/5a7db6c74d55bc51bdf39793
 router.patch('/fileUploads/:id', requireToken, removeBlanks, (req, res, next) => {
-  delete req.body.user
+  delete req.body.owner
 
   FileUpload.findById(req.params.id)
     .then(handle404)

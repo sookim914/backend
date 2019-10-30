@@ -14,9 +14,9 @@ const fileUploadSchema = mongoose.Schema({
     type: String,
     required: true
   },
-  user: {
+  owner: {
     type: mongoose.Schema.Types.ObjectID,
-    ref: 'Owner',
+    ref: 'User',
     required: true
   },
   tag: {
